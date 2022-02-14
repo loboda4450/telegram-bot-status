@@ -1,0 +1,30 @@
+telethon_settings:
+  session: BotStatus
+  auto_reconnect: true
+  retry_delay: 15
+  connection_retries: -1
+  request_retries: 5
+
+  api_id: # here goes your api id
+  api_hash: # here goes your api hash
+
+bots:
+  - ExampleBot:
+      active: true # true if you want to have it checked
+      id: "gamingrootbot" # your bot id to check
+      message_query: "/status" # example message query to send
+      inline_query: "/status" # example inline query to send
+      message: # expected message replies
+        alive_replies:
+          - "I'm alive"
+        dead_reples:
+          - "Database dead"
+      inline: # expected inline replies
+        alive_replies:
+          - "I'm alive"
+        dead_reples:
+          - "Database dead"
+
+
+
+log_level: DEBUG
