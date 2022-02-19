@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+from typing import Dict, List
 
 from influx_line_protocol import Metric, MetricCollection
 from telethon import TelegramClient
@@ -9,6 +10,7 @@ from telethon.events import NewMessage
 from telethon.tl.types import Message
 from yaml import safe_load
 from asyncio import run, get_event_loop
+from pydantic import BaseModel
 
 with open("config.yml", 'r') as f:
     config = safe_load(f)
@@ -17,6 +19,19 @@ bots = config['bots']
 data = {}
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=config['log_level'])
 logger = logging.getLogger(__name__)
+
+
+class botInstance(BaseModel):
+    active: bool
+    id: str
+    timeout: int
+    query: str
+    message: Dict[List[str]]
+    inline: Dict[List[str]]
+
+
+def init_bots(bot_configs: dict):
+    return [botInstance(**bot_configs[bot]) for bot in bot_configs.keys()]
 
 
 async def checker(event: Message):
@@ -32,7 +47,8 @@ async def main(config):
     async with TelegramClient(**config['telethon_settings']) as client:
         await client.start()
 
-        @client.on(event=NewMessage(incoming=True, from_users=(bots[bot]['id'] for bot in bots), func=checker)) # 100% sure i can do it better XD
+        @client.on(event=NewMessage(incoming=True, from_users=(bots[bot]['id'] for bot in bots),
+                                    func=checker))  # 100% sure i can do it better XD
         async def handler(event):
             data[event.from_id.user_id]['answered_on'] = datetime.datetime.timestamp(event.message.date)
 
